@@ -30,6 +30,7 @@ export default function NewsletterBar() {
 
     setStatus("success");
     setEmail("");
+    setTimeout(() => setStatus("idle"), 4000);
   }
 
   return (
@@ -47,35 +48,25 @@ export default function NewsletterBar() {
         </p>
 
         <div className="w-full max-w-sm">
-          {status === "success" ? (
-            <div
-              className="flex items-center gap-2 rounded-sm px-5 py-3 text-sm"
+          <form onSubmit={handleSubmit} className="flex gap-2">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@correo.com"
+              className="flex-1 rounded-sm border-0 px-4 py-3 text-sm outline-none"
               style={{ backgroundColor: "#062028", color: "#F5EFE6" }}
+            />
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              className="rounded-sm px-5 py-3 text-sm font-medium tracking-wide transition-opacity hover:opacity-80 disabled:opacity-50"
+              style={{ backgroundColor: "#D4573A", color: "#F5EFE6" }}
             >
-              <Check size={15} style={{ color: "#7A9E8A" }} />
-              ¡Grazie! Estás suscrita.
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex gap-2">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@correo.com"
-                className="flex-1 rounded-sm border-0 px-4 py-3 text-sm outline-none"
-                style={{ backgroundColor: "#062028", color: "#F5EFE6" }}
-              />
-              <button
-                type="submit"
-                disabled={status === "loading"}
-                className="rounded-sm px-5 py-3 text-sm font-medium tracking-wide transition-opacity hover:opacity-80 disabled:opacity-50"
-                style={{ backgroundColor: "#D4573A", color: "#F5EFE6" }}
-              >
-                {status === "loading" ? "…" : "Suscribirse"}
-              </button>
-            </form>
-          )}
+              {status === "loading" ? "…" : "Suscribirse"}
+            </button>
+          </form>
 
           {status === "error" && (
             <div
@@ -87,6 +78,21 @@ export default function NewsletterBar() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Toast */}
+      <div
+        className="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-5 py-3.5 text-sm transition-all duration-300"
+        style={{
+          backgroundColor: "#062028",
+          color: "#F5EFE6",
+          opacity: status === "success" ? 1 : 0,
+          transform: status === "success" ? "translateY(0)" : "translateY(12px)",
+          pointerEvents: "none",
+        }}
+      >
+        <Check size={15} style={{ color: "#7A9E8A" }} />
+        ¡Grazie! Estás suscrita.
       </div>
     </section>
   );

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase, CATEGORIES, autoSlug } from "@/lib/supabase";
-import { AlertCircle, Check } from "lucide-react";
+import { AlertCircle, Check, ArrowLeft, FileEdit } from "lucide-react";
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -55,6 +55,8 @@ export default function NewPostPage() {
 
     setSaving(true);
     const now = new Date().toISOString();
+    const { data: { user } } = await supabase.auth.getUser();
+    const meta = user?.user_metadata ?? {};
 
     const { error } = await supabase.from("posts").insert({
       title: form.title.trim(),
@@ -68,7 +70,8 @@ export default function NewPostPage() {
       published_at: publish ? now : null,
       created_at: now,
       updated_at: now,
-      author: "Alexandra Rossi",
+      author: meta.display_name ?? "Alexandra Rossi",
+      author_avatar: meta.avatar_url ?? "",
     });
 
     setSaving(false);
@@ -83,34 +86,46 @@ export default function NewPostPage() {
   }
 
   const inputCls =
-    "w-full rounded-sm border px-4 py-3 text-sm outline-none focus:ring-1";
-  const inputStyle = { borderColor: "#D8E6E3", color: "#0E3D45" };
+    "w-full border px-4 py-3 text-sm outline-none transition-colors focus:border-[#1A7A8A]";
+  const inputStyle = { borderColor: "#D8E6E3", color: "#0E3D45", backgroundColor: "#FAFAF7" };
 
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: "#F5EFE6" }}>
-      {/* Nav */}
-      <nav
-        className="flex items-center justify-between border-b px-6 py-4"
-        style={{ backgroundColor: "#FFFFFF", borderColor: "#D8E6E3" }}
-      >
-        <Link
-          href="/admin/dashboard"
-          className="text-sm hover:underline"
-          style={{ color: "#1A7A8A" }}
-        >
-          ← Panel
-        </Link>
-        <span className="font-serif-custom italic" style={{ color: "#0E3D45" }}>
-          Nuevo post
-        </span>
-        <div className="w-20" />
-      </nav>
+    <div className="min-h-screen pb-24" style={{ backgroundColor: "#F5EFE6" }}>
+      {/* Header */}
+      <div className="relative overflow-hidden" style={{ backgroundColor: "#0E3D45" }}>
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{ background: "radial-gradient(circle at 85% 0%, rgba(212,87,58,.3), transparent 55%)" }}
+        />
+        <div className="absolute top-0 left-0 right-0 h-[3px] flex">
+          <div className="flex-1" style={{ backgroundColor: "#D4573A" }} />
+          <div className="flex-1" style={{ backgroundColor: "#F5EFE6" }} />
+          <div className="flex-1" style={{ backgroundColor: "#1A7A8A" }} />
+        </div>
+        <div className="relative z-10 mx-auto max-w-2xl px-6 py-8">
+          <Link
+            href="/admin/dashboard"
+            className="inline-flex items-center gap-1.5 text-[.68rem] tracking-[.14em] uppercase font-semibold mb-4 transition-colors hover:text-[#E8795A]"
+            style={{ color: "#7A9E8A" }}
+          >
+            <ArrowLeft size={13} /> Panel
+          </Link>
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,87,58,.15)", color: "#D4573A" }}>
+              <FileEdit size={15} />
+            </span>
+            <h1 className="font-serif-custom text-2xl italic" style={{ color: "#F5EFE6" }}>
+              Nuevo post
+            </h1>
+          </div>
+        </div>
+      </div>
 
       <div className="mx-auto max-w-2xl px-6 py-10">
         {success && (
           <div
-            className="mb-6 flex items-center gap-2 rounded-sm p-4 text-sm"
-            style={{ backgroundColor: "#D8E6E3", color: "#0E3D45" }}
+            className="mb-6 flex items-center gap-2 p-4 text-sm"
+            style={{ backgroundColor: "rgba(26,122,138,.1)", color: "#0E3D45", border: "1px solid rgba(26,122,138,.25)" }}
           >
             <Check size={15} />
             Post guardado correctamente. Redirigiendo…
@@ -119,14 +134,15 @@ export default function NewPostPage() {
 
         {errors._global && (
           <div
-            className="mb-6 flex items-center gap-2 rounded-sm p-4 text-sm"
-            style={{ backgroundColor: "#D4573A15", color: "#D4573A" }}
+            className="mb-6 flex items-center gap-2 p-4 text-sm"
+            style={{ backgroundColor: "rgba(212,87,58,.1)", color: "#D4573A", border: "1px solid rgba(212,87,58,.25)" }}
           >
             <AlertCircle size={15} />
             {errors._global}
           </div>
         )}
 
+        <div className="bg-white p-8" style={{ border: "1px solid #D8E6E3" }}>
         <div className="space-y-6">
           {/* Title */}
           <Field label="Título" error={errors.title}>
@@ -229,11 +245,11 @@ export default function NewPostPage() {
           </Field>
 
           {/* Published toggle */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 p-4" style={{ backgroundColor: "#F5EFE6" }}>
             <button
               type="button"
               onClick={() => set("published", !form.published)}
-              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0"
               style={{
                 backgroundColor: form.published ? "#1A7A8A" : "#D8E6E3",
               }}
@@ -243,30 +259,31 @@ export default function NewPostPage() {
                 style={{ transform: form.published ? "translateX(22px)" : "translateX(4px)" }}
               />
             </button>
-            <span className="text-sm" style={{ color: "#0E3D45" }}>
-              {form.published ? "Publicar inmediatamente" : "Guardar como borrador"}
+            <span className="text-sm font-medium" style={{ color: "#0E3D45" }}>
+              {form.published ? "Se publicará inmediatamente" : "Se guardará como borrador"}
             </span>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2">
             <button
               onClick={() => save(false)}
               disabled={saving || success}
-              className="rounded-sm border px-6 py-3 text-sm font-medium transition-colors hover:bg-gray-50 disabled:opacity-50"
-              style={{ borderColor: "#D8E6E3", color: "#0E3D45" }}
+              className="px-6 py-3 text-[.68rem] font-semibold tracking-[.14em] uppercase transition-colors hover:border-[#0E3D45] disabled:opacity-50"
+              style={{ border: "1px solid #D8E6E3", color: "#0E3D45" }}
             >
               Guardar como Borrador
             </button>
             <button
               onClick={() => save(true)}
               disabled={saving || success}
-              className="rounded-sm px-6 py-3 text-sm font-medium transition-opacity hover:opacity-80 disabled:opacity-50"
+              className="px-6 py-3 text-[.68rem] font-semibold tracking-[.14em] uppercase transition-colors hover:bg-[#E8795A] disabled:opacity-50"
               style={{ backgroundColor: "#D4573A", color: "#F5EFE6" }}
             >
               {saving ? "Guardando…" : "Publicar"}
             </button>
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -285,14 +302,14 @@ function Field({
   return (
     <div>
       <label
-        className="mb-1 block text-xs font-medium tracking-wide uppercase"
-        style={{ color: "#7A9E8A" }}
+        className="mb-2 block text-[.62rem] font-semibold tracking-[.16em] uppercase"
+        style={{ color: "#1A7A8A" }}
       >
         {label}
       </label>
       {children}
       {error && (
-        <p className="mt-1 text-xs" style={{ color: "#D4573A" }}>
+        <p className="mt-1.5 text-xs" style={{ color: "#D4573A" }}>
           {error}
         </p>
       )}

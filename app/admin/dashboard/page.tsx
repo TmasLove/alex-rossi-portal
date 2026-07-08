@@ -3,14 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase, Post } from "@/lib/supabase";
-import { Plus, Edit2, Trash2, LogOut } from "lucide-react";
+import { supabase, Post, ACCENT_COLORS } from "@/lib/supabase";
+import { Plus, Edit2, Trash2, LogOut, FileText, Eye, EyeOff, Users, Settings, User } from "lucide-react";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState("Alexandra");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [greeting, setGreeting] = useState("");
+  const [accent, setAccent] = useState("coral");
 
   useEffect(() => {
     async function init() {
@@ -19,10 +23,17 @@ export default function AdminDashboard() {
         router.replace("/admin");
         return;
       }
+      const meta = user.user_metadata ?? {};
+      setDisplayName((meta.display_name ?? "Alexandra Rossi").split(" ")[0]);
+      setAvatarUrl(meta.avatar_url ?? "");
+      setGreeting(meta.greeting ?? "");
+      setAccent(meta.accent ?? "coral");
       await fetchPosts();
     }
     init();
   }, [router]);
+
+  const accentHex = ACCENT_COLORS[accent] ?? ACCENT_COLORS.coral;
 
   async function fetchPosts() {
     const { data } = await supabase
@@ -59,177 +70,199 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F5EFE6" }}>
-      {/* Top nav */}
-      <nav
-        className="flex items-center justify-between border-b px-6 py-4"
-        style={{ backgroundColor: "#FFFFFF", borderColor: "#D8E6E3" }}
-      >
-        <span className="font-serif-custom text-lg italic" style={{ color: "#0E3D45" }}>
-          Alexandra Rossi · Admin
-        </span>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin/posts/new"
-            className="flex items-center gap-2 rounded-sm px-5 py-2 text-sm font-medium transition-opacity hover:opacity-80"
-            style={{ backgroundColor: "#D4573A", color: "#F5EFE6" }}
-          >
-            <Plus size={15} />
-            Nuevo Post
-          </Link>
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 rounded-sm border px-4 py-2 text-sm transition-colors hover:bg-gray-50"
-            style={{ borderColor: "#D8E6E3", color: "#0E3D45" }}
-          >
-            <LogOut size={14} />
-            Cerrar sesión
-          </button>
+      {/* Gradient header */}
+      <div className="relative overflow-hidden" style={{ backgroundColor: "#0E3D45" }}>
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{ background: `radial-gradient(circle at 15% 0%, ${accentHex}59, transparent 55%)` }}
+        />
+        <div className="absolute top-0 left-0 right-0 h-[3px] flex">
+          <div className="flex-1" style={{ backgroundColor: "#D4573A" }} />
+          <div className="flex-1" style={{ backgroundColor: "#F5EFE6" }} />
+          <div className="flex-1" style={{ backgroundColor: "#1A7A8A" }} />
         </div>
-      </nav>
+        <div className="relative z-10 mx-auto max-w-5xl px-6 py-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center"
+              style={{ backgroundColor: "rgba(245,239,230,.12)" }}
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <User size={22} style={{ color: "#D8E6E3" }} />
+              )}
+            </div>
+            <div>
+              <p className="text-[.58rem] tracking-[.24em] uppercase font-semibold mb-1" style={{ color: accentHex }}>
+                Panel de administración
+              </p>
+              <h1 className="font-serif-custom text-3xl italic" style={{ color: "#F5EFE6" }}>
+                Bienvenida, {displayName}
+              </h1>
+              {greeting && (
+                <p className="text-[.78rem] mt-1" style={{ color: "#D8E6E3" }}>
+                  {greeting}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link
+              href="/admin/subscribers"
+              className="flex items-center gap-2 px-4 py-2.5 text-[.68rem] font-semibold tracking-[.15em] uppercase transition-colors hover:border-[#E8795A] hover:text-[#E8795A]"
+              style={{ border: "1px solid rgba(245,239,230,.25)", color: "#D8E6E3" }}
+            >
+              <Users size={13} />
+              Suscriptores
+            </Link>
+            <Link
+              href="/admin/settings"
+              className="flex items-center gap-2 px-4 py-2.5 text-[.68rem] font-semibold tracking-[.15em] uppercase transition-colors hover:border-[#E8795A] hover:text-[#E8795A]"
+              style={{ border: "1px solid rgba(245,239,230,.25)", color: "#D8E6E3" }}
+            >
+              <Settings size={13} />
+              Ajustes
+            </Link>
+            <Link
+              href="/admin/posts/new"
+              className="flex items-center gap-2 px-5 py-2.5 text-[.68rem] font-semibold tracking-[.15em] uppercase transition-opacity hover:opacity-85"
+              style={{ backgroundColor: accentHex, color: "#F5EFE6" }}
+            >
+              <Plus size={14} />
+              Nuevo Post
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-2 px-4 py-2.5 text-[.68rem] font-semibold tracking-[.15em] uppercase transition-colors"
+              style={{ border: "1px solid rgba(245,239,230,.25)", color: "#D8E6E3" }}
+            >
+              <LogOut size={13} />
+              Salir
+            </button>
+          </div>
+        </div>
+      </div>
 
-      <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="mx-auto max-w-5xl px-6 py-12">
         {/* Stats */}
-        <div className="mb-10 grid grid-cols-3 gap-4">
+        <div className="mb-12 grid grid-cols-3 gap-4">
           {[
-            { label: "Total de posts", value: posts.length },
-            { label: "Publicados", value: published },
-            { label: "Borradores", value: drafts },
+            { label: "Total de posts", value: posts.length, icon: FileText, color: "#0E3D45" },
+            { label: "Publicados",     value: published,    icon: Eye,      color: "#1A7A8A" },
+            { label: "Borradores",     value: drafts,        icon: EyeOff,   color: "#D4573A" },
           ].map((s) => (
             <div
               key={s.label}
-              className="rounded-sm p-6 text-center"
-              style={{ backgroundColor: "#FFFFFF", border: "1px solid #D8E6E3" }}
+              className="p-6 text-center bg-white"
+              style={{ borderTop: `2px solid ${s.color}` }}
             >
+              <s.icon size={16} className="mx-auto mb-3" style={{ color: s.color }} />
               <p
                 className="font-serif-custom text-4xl italic"
                 style={{ color: "#0E3D45" }}
               >
                 {s.value}
               </p>
-              <p className="mt-1 text-xs tracking-wide" style={{ color: "#7A9E8A" }}>
+              <p className="mt-1.5 text-[.62rem] tracking-[.14em] uppercase font-medium" style={{ color: "#7A9E8A" }}>
                 {s.label}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Posts table */}
-        <div
-          className="overflow-hidden rounded-sm"
-          style={{ border: "1px solid #D8E6E3" }}
-        >
-          <div
-            className="px-6 py-4"
-            style={{ backgroundColor: "#FFFFFF", borderBottom: "1px solid #D8E6E3" }}
-          >
-            <h2 className="text-sm font-medium" style={{ color: "#0E3D45" }}>
-              Todos los posts
-            </h2>
-          </div>
+        {/* Posts list */}
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-serif-custom text-xl italic" style={{ color: "#0E3D45" }}>
+            Todos los posts
+          </h2>
+        </div>
 
-          {loading ? (
-            <div className="py-16 text-center" style={{ backgroundColor: "#FFFFFF" }}>
+        {loading ? (
+          <div className="py-20 text-center bg-white border border-[#D8E6E3]">
+            <div
+              className="mx-auto h-6 w-6 animate-spin rounded-full border-2"
+              style={{ borderColor: "#D8E6E3", borderTopColor: "#1A7A8A" }}
+            />
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="py-20 text-center bg-white border border-[#D8E6E3]">
+            <p className="text-sm" style={{ color: "#7A9E8A" }}>
+              No hay posts aún.{" "}
+              <Link href="/admin/posts/new" className="font-semibold" style={{ color: "#D4573A" }}>
+                Crea el primero.
+              </Link>
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {posts.map((post) => (
               <div
-                className="mx-auto h-6 w-6 animate-spin rounded-full border-2"
-                style={{ borderColor: "#D8E6E3", borderTopColor: "#1A7A8A" }}
-              />
-            </div>
-          ) : posts.length === 0 ? (
-            <div className="py-16 text-center" style={{ backgroundColor: "#FFFFFF" }}>
-              <p className="text-sm" style={{ color: "#7A9E8A" }}>
-                No hay posts aún.{" "}
-                <Link href="/admin/posts/new" style={{ color: "#D4573A" }}>
-                  Crea el primero.
-                </Link>
-              </p>
-            </div>
-          ) : (
-            <table className="w-full" style={{ backgroundColor: "#FFFFFF" }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid #D8E6E3" }}>
-                  {["Título", "Categoría", "Estado", "Fecha", "Acciones"].map(
-                    (h) => (
-                      <th
-                        key={h}
-                        className="px-6 py-3 text-left text-xs font-medium tracking-wide uppercase"
-                        style={{ color: "#7A9E8A" }}
-                      >
-                        {h}
-                      </th>
-                    )
+                key={post.id}
+                className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white p-5 border border-[#D8E6E3] hover:border-[#D4573A] transition-colors"
+              >
+                {/* Cover thumbnail */}
+                <div className="w-full sm:w-20 h-20 flex-shrink-0 overflow-hidden" style={{ backgroundColor: "#D8E6E3" }}>
+                  {post.cover_image ? (
+                    <img src={post.cover_image} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <FileText size={18} style={{ color: "#7A9E8A" }} />
+                    </div>
                   )}
-                </tr>
-              </thead>
-              <tbody>
-                {posts.map((post, i) => (
-                  <tr
-                    key={post.id}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span
+                      className="text-[.58rem] tracking-[.12em] uppercase font-bold px-2 py-0.5"
+                      style={
+                        post.published
+                          ? { backgroundColor: "rgba(26,122,138,.12)", color: "#1A7A8A" }
+                          : { backgroundColor: "rgba(212,87,58,.1)", color: "#D4573A" }
+                      }
+                    >
+                      {post.published ? "Publicado" : "Borrador"}
+                    </span>
+                    <span className="text-[.68rem] uppercase tracking-wide" style={{ color: "#7A9E8A" }}>
+                      {post.category}
+                    </span>
+                  </div>
+                  <h3 className="font-serif-custom text-lg italic truncate" style={{ color: "#0E3D45" }}>
+                    {post.title}
+                  </h3>
+                  <p className="text-[.72rem] mt-0.5" style={{ color: "#7A9E8A" }}>
+                    {formatDate(post.created_at)}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Link
+                    href={`/admin/posts/${post.id}`}
+                    className="flex items-center gap-1.5 px-4 py-2 text-[.68rem] font-semibold tracking-wide uppercase transition-colors hover:border-[#0E3D45]"
+                    style={{ border: "1px solid #D8E6E3", color: "#0E3D45" }}
+                  >
+                    <Edit2 size={12} />
+                    Editar
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(post.id, post.title)}
+                    disabled={deletingId === post.id}
+                    className="flex items-center gap-1.5 px-4 py-2 text-[.68rem] font-semibold tracking-wide uppercase transition-opacity hover:opacity-80 disabled:opacity-40"
                     style={{
-                      borderBottom:
-                        i < posts.length - 1 ? "1px solid #D8E6E3" : "none",
+                      border: "1px solid rgba(212,87,58,.25)",
+                      color: "#D4573A",
+                      backgroundColor: "rgba(212,87,58,.06)",
                     }}
                   >
-                    <td className="px-6 py-4">
-                      <span
-                        className="font-medium text-sm line-clamp-1"
-                        style={{ color: "#0E3D45" }}
-                      >
-                        {post.title}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm" style={{ color: "#1A7A8A" }}>
-                        {post.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className="rounded-sm px-2 py-1 text-xs font-medium"
-                        style={
-                          post.published
-                            ? { backgroundColor: "#D8E6E3", color: "#0E3D45" }
-                            : { backgroundColor: "#F5EFE6", color: "#7A9E8A", border: "1px solid #D8E6E3" }
-                        }
-                      >
-                        {post.published ? "Publicado" : "Borrador"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-xs" style={{ color: "#7A9E8A" }}>
-                        {formatDate(post.created_at)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/admin/posts/${post.id}`}
-                          className="flex items-center gap-1 rounded-sm px-3 py-1.5 text-xs transition-colors hover:bg-gray-50"
-                          style={{ border: "1px solid #D8E6E3", color: "#0E3D45" }}
-                        >
-                          <Edit2 size={12} />
-                          Editar
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(post.id, post.title)}
-                          disabled={deletingId === post.id}
-                          className="flex items-center gap-1 rounded-sm px-3 py-1.5 text-xs transition-colors hover:opacity-80 disabled:opacity-40"
-                          style={{
-                            border: "1px solid #D4573A20",
-                            color: "#D4573A",
-                            backgroundColor: "#D4573A10",
-                          }}
-                        >
-                          <Trash2 size={12} />
-                          {deletingId === post.id ? "…" : "Eliminar"}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+                    <Trash2 size={12} />
+                    {deletingId === post.id ? "…" : "Eliminar"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

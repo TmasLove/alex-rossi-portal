@@ -43,9 +43,10 @@ export default function PrensaPage() {
   return (
     <main style={{ backgroundColor: "#F5EFE6" }}>
       <PageHero
+        image="https://alexandrarossi.com/wp-content/uploads/2021/02/Foto-Alexandra-Rossi-6-768x432.jpg"
+        eyebrow="Medios"
         title="Prensa"
         subtitle="Información para medios, periodistas y colaboradores."
-        backgroundImage=""
       />
 
       {/* Bio section */}

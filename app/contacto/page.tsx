@@ -60,9 +60,10 @@ export default function ContactoPage() {
   return (
     <main style={{ backgroundColor: "#F5EFE6" }}>
       <PageHero
+        image="https://alexandrarossi.com/wp-content/uploads/2021/02/Foto-Alexandra-Rossi-8-768x432.jpg"
+        eyebrow="Hablemos"
         title="Contacto"
         subtitle="Escríbenos — estamos encantadas de escucharte."
-        backgroundImage=""
       />
 
       {/* Contact cards */}

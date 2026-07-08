@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import RevealOnScroll from "@/components/RevealOnScroll";
 
 const portals = [
   { title: "Mi Perfil",     sub: "Biografía & Prensa",   href: "/mi-perfil",     img: "https://alexandrarossi.com/wp-content/uploads/2021/02/Foto-Alexandra-Rossi-3.jpg",    accent: "#D4573A" },
@@ -8,6 +9,7 @@ const portals = [
   { title: "Italia",        sub: "Portal Italiano",       href: "/italia",        img: "https://alexandrarossi.com/wp-content/uploads/2021/02/Alexa-18-1024x576.jpg",         accent: "#7A9E8A" },
   { title: "Colecciones",   sub: "Papeles & Textiles",    href: "/colecciones",   img: "https://alexandrarossi.com/wp-content/uploads/2021/02/Alexa-24b-1024x576.jpg",        accent: "#D4573A" },
   { title: "Casa",          sub: "Bienes Raíces",         href: "/casa",          img: "https://alexandrarossi.com/wp-content/uploads/2021/02/Alexa-21b-1024x576.jpg",        accent: "#1A7A8A" },
+  { title: "Suplementos",   sub: "Dolce Vita Supplements", href: "/suplementos",  img: "https://www.dolcevitasupplements.com/cdn/shop/files/Sleep_Mockup.jpg?v=1756327071&width=533", accent: "#7A9E8A" },
 ];
 
 export default function Home() {
@@ -57,39 +59,43 @@ export default function Home() {
 
       {/* PORTALS */}
       <section className="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28">
-        <div className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <RevealOnScroll className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <p className="text-[.58rem] tracking-[.24em] uppercase text-[#D4573A] font-semibold mb-2">El Ecosistema</p>
             <h2 className="font-serif-custom text-[clamp(2rem,5vw,3.5rem)] italic font-normal text-[#0E3D45] leading-tight">Todos los portales</h2>
           </div>
           <p className="text-[.85rem] text-[#5A7A80] max-w-xs leading-relaxed">Un universo de contenido, estilo y diseño.</p>
-        </div>
+        </RevealOnScroll>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {portals.map((p) => (
-            <Link key={p.href} href={p.href} className="group relative overflow-hidden aspect-[4/3] bg-[#163A44] block">
-              <img src={p.img} alt={p.title} className="absolute inset-0 w-full h-full object-cover opacity-60 transition-all duration-500 group-hover:opacity-80 group-hover:scale-[1.04]" />
-              <div className="absolute inset-0" style={{ background: "linear-gradient(to top,rgba(6,32,40,.85) 0%,transparent 60%)" }} />
-              <div className="absolute bottom-0 left-0 p-5">
-                <p className="text-[.55rem] tracking-[.2em] uppercase font-semibold mb-1" style={{ color: p.accent }}>{p.sub}</p>
-                <h3 className="font-serif-custom text-2xl italic font-normal text-[#F5EFE6]">{p.title}</h3>
-                <div className="mt-3 flex items-center gap-2 text-[.62rem] tracking-[.15em] uppercase text-[rgba(245,239,230,.45)] group-hover:text-[#E8795A] transition-colors">
-                  <span>Explorar</span><span className="transition-transform group-hover:translate-x-1">→</span>
+          {portals.map((p, i) => (
+            <RevealOnScroll key={p.href} delay={i * 90}>
+              <Link href={p.href} className="group relative overflow-hidden aspect-[4/3] bg-[#163A44] block">
+                <img src={p.img} alt={p.title} className="absolute inset-0 w-full h-full object-cover opacity-60 transition-all duration-500 group-hover:opacity-80 group-hover:scale-[1.04]" />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top,rgba(6,32,40,.85) 0%,transparent 60%)" }} />
+                <div className="absolute bottom-0 left-0 p-5">
+                  <p className="text-[.55rem] tracking-[.2em] uppercase font-semibold mb-1" style={{ color: p.accent }}>{p.sub}</p>
+                  <h3 className="font-serif-custom text-2xl italic font-normal text-[#F5EFE6]">{p.title}</h3>
+                  <div className="mt-3 flex items-center gap-2 text-[.62rem] tracking-[.15em] uppercase text-[rgba(245,239,230,.45)] group-hover:text-[#E8795A] transition-colors">
+                    <span>Explorar</span><span className="transition-transform group-hover:translate-x-1">→</span>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </RevealOnScroll>
           ))}
         </div>
       </section>
 
       {/* SOCIAL CTA */}
-      <section className="bg-[#0E3D45] py-16 px-8 text-center">
-        <p className="text-[.58rem] tracking-[.24em] uppercase text-[#D4573A] font-semibold mb-2">Sígueme</p>
-        <h2 className="font-serif-custom text-3xl italic text-[#F5EFE6] mb-6">@alexandrarossicom</h2>
-        <a href="https://www.instagram.com/alexandrarossicom/" target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-[.68rem] tracking-[.18em] uppercase font-semibold text-white bg-[#D4573A] px-7 py-3 hover:bg-[#E8795A] transition-colors">
-          Ver Instagram
-        </a>
-      </section>
+      <RevealOnScroll className="block">
+        <section className="bg-[#0E3D45] py-16 px-8 text-center">
+          <p className="text-[.58rem] tracking-[.24em] uppercase text-[#D4573A] font-semibold mb-2">Sígueme</p>
+          <h2 className="font-serif-custom text-3xl italic text-[#F5EFE6] mb-6">@alexandrarossicom</h2>
+          <a href="https://www.instagram.com/alexandrarossicom/" target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-[.68rem] tracking-[.18em] uppercase font-semibold text-white bg-[#D4573A] px-7 py-3 hover:bg-[#E8795A] transition-colors">
+            Ver Instagram
+          </a>
+        </section>
+      </RevealOnScroll>
     </>
   );
 }

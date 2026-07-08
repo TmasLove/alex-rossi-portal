@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ExternalLink, Mail, Check } from "lucide-react";
+import RevealOnScroll from "@/components/RevealOnScroll";
 
 const trustBadges = ["Vegan & Kosher", "Clinically Studied", "Made in Miami", "4.9 ★ from 3,000+", "No Water Needed", "Felt in Minutes"];
 
@@ -96,16 +97,18 @@ export default function Suplementos() {
           Faster absorption, precise dosing, zero added sugar. Compare how strips outperform capsules, gummies, and tablets.
         </p>
 
-        <div className="bg-white border border-[#D8E6E3] text-left max-w-md mx-auto">
-          {compare.map((c, i) => (
-            <div key={c.feature} className={`flex items-center justify-between px-6 py-3.5 ${i !== compare.length - 1 ? "border-b border-[#D8E6E3]" : ""}`}>
-              <span className="text-[.8rem] text-[#2E5A62]">{c.feature}</span>
-              <span className="w-6 h-6 rounded-full bg-[#7A9E8A] flex items-center justify-center flex-shrink-0">
-                <Check size={13} className="text-white" />
-              </span>
-            </div>
-          ))}
-        </div>
+        <RevealOnScroll className="block">
+          <div className="bg-white border border-[#D8E6E3] text-left max-w-md mx-auto">
+            {compare.map((c, i) => (
+              <div key={c.feature} className={`flex items-center justify-between px-6 py-3.5 ${i !== compare.length - 1 ? "border-b border-[#D8E6E3]" : ""}`}>
+                <span className="text-[.8rem] text-[#2E5A62]">{c.feature}</span>
+                <span className="w-6 h-6 rounded-full bg-[#7A9E8A] flex items-center justify-center flex-shrink-0">
+                  <Check size={13} className="text-white" />
+                </span>
+              </div>
+            ))}
+          </div>
+        </RevealOnScroll>
       </section>
 
       {/* ── PRODUCTS ── */}
@@ -127,22 +130,23 @@ export default function Suplementos() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {products.map(p => (
-              <a
-                key={p.name}
-                href={p.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white overflow-hidden group hover:shadow-xl transition-shadow duration-300 block"
-              >
-                <div className="relative overflow-hidden aspect-[4/3]">
-                  <img src={p.img} alt={p.name} className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500" />
-                </div>
-                <div className="p-5 flex items-center justify-between">
-                  <h3 className="font-serif-custom text-lg italic text-[#0E3D45]">{p.name}</h3>
-                  <span className="text-[.75rem] font-semibold text-[#D4573A]">{p.price}</span>
-                </div>
-              </a>
+            {products.map((p, i) => (
+              <RevealOnScroll key={p.name} delay={(i % 3) * 90}>
+                <a
+                  href={p.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white overflow-hidden group hover:shadow-xl transition-shadow duration-300 block"
+                >
+                  <div className="relative overflow-hidden aspect-[4/3]">
+                    <img src={p.img} alt={p.name} className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500" />
+                  </div>
+                  <div className="p-5 flex items-center justify-between">
+                    <h3 className="font-serif-custom text-lg italic text-[#0E3D45]">{p.name}</h3>
+                    <span className="text-[.75rem] font-semibold text-[#D4573A]">{p.price}</span>
+                  </div>
+                </a>
+              </RevealOnScroll>
             ))}
           </div>
         </div>
@@ -158,12 +162,14 @@ export default function Suplementos() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {steps.map(s => (
-            <div key={s.n} className="text-center">
-              <p className="font-serif-custom text-4xl italic text-[#D4573A] mb-3">{s.n}</p>
-              <h4 className="text-[.75rem] tracking-[.12em] uppercase font-bold text-[#0E3D45] mb-2">{s.title}</h4>
-              <p className="text-[.82rem] text-[#5A7A80] leading-relaxed">{s.desc}</p>
-            </div>
+          {steps.map((s, i) => (
+            <RevealOnScroll key={s.n} delay={i * 100} className="block">
+              <div className="text-center">
+                <p className="font-serif-custom text-4xl italic text-[#D4573A] mb-3">{s.n}</p>
+                <h4 className="text-[.75rem] tracking-[.12em] uppercase font-bold text-[#0E3D45] mb-2">{s.title}</h4>
+                <p className="text-[.82rem] text-[#5A7A80] leading-relaxed">{s.desc}</p>
+              </div>
+            </RevealOnScroll>
           ))}
         </div>
         <div className="text-center mt-12">
@@ -184,43 +190,47 @@ export default function Suplementos() {
           <p className="text-[.55rem] tracking-[.28em] uppercase text-[#D4573A] font-medium mb-3 text-center">Rated 4.9 / 5 by 3,000+ very happy people</p>
           <h2 className="font-serif-custom text-[clamp(1.8rem,4vw,2.6rem)] italic text-[#F5EFE6] mb-12 text-center">Real people. Real rituals.</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map(t => (
-              <div key={t.name} className="border-t-2 border-[#D4573A] pt-5">
-                <p className="text-[.82rem] italic text-[rgba(245,239,230,.75)] leading-relaxed mb-5">"{t.quote}"</p>
-                <p className="text-[.65rem] tracking-[.1em] uppercase text-[#E8795A] font-semibold">{t.name}</p>
-                <p className="text-[.68rem] text-[rgba(245,239,230,.35)]">{t.city}</p>
-              </div>
+            {testimonials.map((t, i) => (
+              <RevealOnScroll key={t.name} delay={i * 100} className="block">
+                <div className="border-t-2 border-[#D4573A] pt-5">
+                  <p className="text-[.82rem] italic text-[rgba(245,239,230,.75)] leading-relaxed mb-5">"{t.quote}"</p>
+                  <p className="text-[.65rem] tracking-[.1em] uppercase text-[#E8795A] font-semibold">{t.name}</p>
+                  <p className="text-[.68rem] text-[rgba(245,239,230,.35)]">{t.city}</p>
+                </div>
+              </RevealOnScroll>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── CTA BAND ── */}
-      <section className="bg-[#D8E6E3] py-16 px-8">
-        <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-          <div>
-            <p className="text-[.58rem] tracking-[.24em] uppercase text-[#D4573A] font-semibold mb-2">Made in Miami, FL</p>
-            <h2 className="font-serif-custom text-2xl italic text-[#0E3D45]">Ready to feel it in minutes?</h2>
-            <p className="text-[.82rem] text-[#5A7A80] mt-2">Part of the La Dolce Vita family — plant-powered daily health essentials.</p>
+      <RevealOnScroll className="block">
+        <section className="bg-[#D8E6E3] py-16 px-8">
+          <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+            <div>
+              <p className="text-[.58rem] tracking-[.24em] uppercase text-[#D4573A] font-semibold mb-2">Made in Miami, FL</p>
+              <h2 className="font-serif-custom text-2xl italic text-[#0E3D45]">Ready to feel it in minutes?</h2>
+              <p className="text-[.82rem] text-[#5A7A80] mt-2">Part of the La Dolce Vita family — plant-powered daily health essentials.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+              <a
+                href="https://www.dolcevitasupplements.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-[.65rem] tracking-[.18em] uppercase font-semibold text-white bg-[#D4573A] px-7 py-3.5 hover:bg-[#E8795A] transition-colors"
+              >
+                Visit dolcevitasupplements.com <ExternalLink size={12} />
+              </a>
+              <a
+                href="mailto:hello@dolcevitasupplements.com"
+                className="inline-flex items-center gap-2 text-[.65rem] tracking-[.18em] uppercase font-semibold text-[#0E3D45] border border-[rgba(14,61,69,.3)] px-7 py-3.5 hover:border-[#D4573A] hover:text-[#D4573A] transition-colors"
+              >
+                <Mail size={13} /> Contact us
+              </a>
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
-            <a
-              href="https://www.dolcevitasupplements.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[.65rem] tracking-[.18em] uppercase font-semibold text-white bg-[#D4573A] px-7 py-3.5 hover:bg-[#E8795A] transition-colors"
-            >
-              Visit dolcevitasupplements.com <ExternalLink size={12} />
-            </a>
-            <a
-              href="mailto:hello@dolcevitasupplements.com"
-              className="inline-flex items-center gap-2 text-[.65rem] tracking-[.18em] uppercase font-semibold text-[#0E3D45] border border-[rgba(14,61,69,.3)] px-7 py-3.5 hover:border-[#D4573A] hover:text-[#D4573A] transition-colors"
-            >
-              <Mail size={13} /> Contact us
-            </a>
-          </div>
-        </div>
-      </section>
+        </section>
+      </RevealOnScroll>
     </>
   );
 }

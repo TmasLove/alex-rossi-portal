@@ -19,8 +19,10 @@ type Post = {
   published: boolean;
   published_at: string;
   created_at: string;
+  updated_at: string;
   geo_region: string;
   author: string;
+  author_avatar?: string;
 };
 
 async function getPost(slug: string): Promise<Post | null> {
@@ -150,7 +152,14 @@ export default async function BlogPostPage({
             <span className="text-xs" style={{ color: "#7A9E8A" }}>
               {formatDate(post.published_at ?? post.created_at)}
             </span>
-            <span className="text-xs" style={{ color: "#7A9E8A" }}>
+            <span className="flex items-center gap-2 text-xs" style={{ color: "#7A9E8A" }}>
+              {post.author_avatar ? (
+                <img
+                  src={post.author_avatar}
+                  alt={post.author}
+                  className="w-5 h-5 rounded-full object-cover"
+                />
+              ) : null}
               {post.author}
             </span>
           </div>

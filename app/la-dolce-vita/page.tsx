@@ -1,7 +1,10 @@
 import PageHero from "@/components/PageHero";
+import YoutubeModalTrigger from "@/components/YoutubeModalTrigger";
 import { Play } from "lucide-react";
 
 export const metadata = { title: "La Dolce Vita — Alexandra Rossi" };
+
+const CHANNEL_EMBED = "https://www.youtube.com/embed/videoseries?list=UUGMPFUOe1ROvZthpEEA4HMg";
 
 const episodes = [
   { n: "01", title: "Roma Eterna",     desc: "Los secretos de la ciudad que nunca duerme.", img: "https://alexandrarossi.com/wp-content/uploads/2021/02/Alexa-21b-1024x576.jpg" },
@@ -47,16 +50,14 @@ export default function LaDolceVita() {
             className="w-full h-full object-cover opacity-70 group-hover:opacity-85 transition-opacity duration-300"
           />
           <div className="absolute inset-0 flex items-center justify-center">
-            <a
-              href="https://www.youtube.com/channel/UCGMPFUOe1ROvZthpEEA4HMg"
-              target="_blank"
-              rel="noopener noreferrer"
+            <YoutubeModalTrigger
+              embedUrl={CHANNEL_EMBED}
               className="w-16 h-16 bg-[#D4573A] flex items-center justify-center hover:bg-[#E8795A] transition-colors duration-200"
             >
               <Play fill="#fff" size={22} className="ml-1" />
-            </a>
+            </YoutubeModalTrigger>
           </div>
-          <p className="absolute bottom-3 left-4 text-[.58rem] tracking-[.2em] uppercase text-[rgba(245,239,230,.6)]">Ver en YouTube</p>
+          <p className="absolute bottom-3 left-4 text-[.58rem] tracking-[.2em] uppercase text-[rgba(245,239,230,.6)]">Ver tráiler</p>
         </div>
       </section>
 
@@ -68,12 +69,10 @@ export default function LaDolceVita() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {episodes.map((ep) => (
-              <a
+              <YoutubeModalTrigger
                 key={ep.n}
-                href="https://www.youtube.com/channel/UCGMPFUOe1ROvZthpEEA4HMg"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative overflow-hidden bg-[#163A44] block"
+                embedUrl={CHANNEL_EMBED}
+                className="group relative overflow-hidden bg-[#163A44] block text-left w-full"
               >
                 <div className="relative aspect-video overflow-hidden">
                   <img src={ep.img} alt={ep.title} className="w-full h-full object-cover opacity-65 group-hover:opacity-85 group-hover:scale-[1.04] transition-all duration-500" />
@@ -88,7 +87,7 @@ export default function LaDolceVita() {
                   <h3 className="font-serif-custom text-xl italic text-[#F5EFE6] mt-1 mb-2">{ep.title}</h3>
                   <p className="text-[.78rem] text-[rgba(245,239,230,.5)] leading-relaxed">{ep.desc}</p>
                 </div>
-              </a>
+              </YoutubeModalTrigger>
             ))}
           </div>
         </div>
@@ -97,15 +96,13 @@ export default function LaDolceVita() {
       {/* WATCH CTA */}
       <section className="py-16 px-8 text-center bg-[#D8E6E3]">
         <p className="text-[.58rem] tracking-[.24em] uppercase text-[#D4573A] font-semibold mb-2">Disponible ahora</p>
-        <h2 className="font-serif-custom text-3xl italic text-[#0E3D45] mb-6">Mira todos los episodios en YouTube</h2>
-        <a
-          href="https://www.youtube.com/channel/UCGMPFUOe1ROvZthpEEA4HMg"
-          target="_blank"
-          rel="noopener noreferrer"
+        <h2 className="font-serif-custom text-3xl italic text-[#0E3D45] mb-6">Mira todos los episodios</h2>
+        <YoutubeModalTrigger
+          embedUrl={CHANNEL_EMBED}
           className="inline-flex items-center gap-2 text-[.68rem] tracking-[.18em] uppercase font-semibold text-white bg-[#D4573A] px-8 py-3.5 hover:bg-[#E8795A] transition-colors"
         >
-          <Play size={14} fill="white" /> Ver en YouTube
-        </a>
+          <Play size={14} fill="white" /> Ver episodios
+        </YoutubeModalTrigger>
       </section>
     </>
   );

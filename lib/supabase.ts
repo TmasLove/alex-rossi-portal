@@ -14,6 +14,13 @@ export type Post = {
   updated_at: string;
   geo_region: string;
   author: string;
+  author_avatar?: string;
+};
+
+export const ACCENT_COLORS: Record<string, string> = {
+  coral: "#D4573A",
+  teal: "#1A7A8A",
+  sage: "#7A9E8A",
 };
 
 const url  = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";

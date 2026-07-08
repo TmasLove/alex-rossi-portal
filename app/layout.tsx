@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
-import NewsletterBar from "@/components/NewsletterBar";
+import SiteChrome from "@/components/SiteChrome";
 
 export const metadata: Metadata = {
   title: "Alexandra Rossi",
@@ -13,10 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className="h-full">
       <body className="min-h-full flex flex-col bg-[#F5EFE6]">
-        <Nav />
-        <main className="flex-1">{children}</main>
-        <NewsletterBar />
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
