@@ -4,19 +4,64 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { ArrowLeft, Users, Download, Trash2, Mail } from "lucide-react";
+import { ArrowLeft, Users, Download, Trash2, Mail, Globe, Monitor, MapPin, ChevronDown, Repeat } from "lucide-react";
 
 type Subscriber = {
   id: string;
   email: string;
   created_at: string;
+  last_seen_at?: string;
+  visit_count?: number;
+  ip_address?: string;
+  user_agent?: string;
+  referrer?: string;
+  page_path?: string;
 };
+
+const PAGE_NAMES: Record<string, string> = {
+  "/": "Inicio",
+  "/mi-perfil": "Mi Perfil",
+  "/la-dolce-vita": "La Dolce Vita",
+  "/la-dolce-vita-italia": "La Dolce Vita Italia",
+  "/italia": "Italia",
+  "/colecciones": "Colecciones",
+  "/casa": "Casa",
+  "/suplementos": "Suplementos",
+  "/tienda": "Tienda (Próximamente)",
+  "/contacto": "Contacto",
+  "/prensa": "Prensa",
+  "/blog": "Blog",
+};
+
+function parsePageName(path?: string) {
+  if (!path) return "—";
+  if (PAGE_NAMES[path]) return PAGE_NAMES[path];
+  if (path.startsWith("/blog/")) return `Blog — ${path.replace("/blog/", "")}`;
+  return path;
+}
+
+function parseDevice(ua?: string) {
+  if (!ua) return "—";
+  const browser =
+    /Edg\//.test(ua) ? "Edge" :
+    /Chrome\//.test(ua) ? "Chrome" :
+    /Safari\//.test(ua) && !/Chrome/.test(ua) ? "Safari" :
+    /Firefox\//.test(ua) ? "Firefox" : "Navegador";
+  const os =
+    /iPhone|iPad/.test(ua) ? "iOS" :
+    /Android/.test(ua) ? "Android" :
+    /Mac OS/.test(ua) ? "macOS" :
+    /Windows/.test(ua) ? "Windows" :
+    /Linux/.test(ua) ? "Linux" : "";
+  return [browser, os].filter(Boolean).join(" · ");
+}
 
 export default function SubscribersPage() {
   const router = useRouter();
   const [subs, setSubs] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     async function init() {
@@ -45,7 +90,19 @@ export default function SubscribersPage() {
   }
 
   function exportCsv() {
-    const rows = [["email", "fecha"], ...subs.map((s) => [s.email, formatDate(s.created_at)])];
+    const rows = [
+      ["email", "fecha de registro", "última visita", "visitas", "ip", "dispositivo", "última página", "referrer"],
+      ...subs.map((s) => [
+        s.email,
+        formatDate(s.created_at),
+        s.last_seen_at ? formatDate(s.last_seen_at) : formatDate(s.created_at),
+        String(s.visit_count ?? 1),
+        s.ip_address ?? "",
+        parseDevice(s.user_agent),
+        parsePageName(s.page_path),
+        s.referrer ?? "",
+      ]),
+    ];
     const csv = rows.map((r) => r.map((v) => `"${v.replace(/"/g, '""')}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -129,29 +186,91 @@ export default function SubscribersPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {subs.map((s) => (
-              <div
-                key={s.id}
-                className="flex items-center justify-between gap-4 bg-white px-5 py-4 border border-[#D8E6E3] hover:border-[#1A7A8A] transition-colors"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <Mail size={15} style={{ color: "#7A9E8A" }} className="flex-shrink-0" />
-                  <span className="text-sm font-medium truncate" style={{ color: "#0E3D45" }}>{s.email}</span>
-                </div>
-                <div className="flex items-center gap-4 flex-shrink-0">
-                  <span className="text-[.72rem]" style={{ color: "#7A9E8A" }}>{formatDate(s.created_at)}</span>
+            {subs.map((s) => {
+              const isOpen = expandedId === s.id;
+              return (
+                <div key={s.id} className="bg-white border border-[#D8E6E3] hover:border-[#1A7A8A] transition-colors">
                   <button
-                    onClick={() => handleDelete(s.id, s.email)}
-                    disabled={deletingId === s.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-[.65rem] font-semibold tracking-wide uppercase transition-opacity hover:opacity-80 disabled:opacity-40"
-                    style={{ border: "1px solid rgba(212,87,58,.25)", color: "#D4573A", backgroundColor: "rgba(212,87,58,.06)" }}
+                    onClick={() => setExpandedId(isOpen ? null : s.id)}
+                    className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"
                   >
-                    <Trash2 size={12} />
-                    {deletingId === s.id ? "…" : "Eliminar"}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Mail size={15} style={{ color: "#7A9E8A" }} className="flex-shrink-0" />
+                      <span className="text-sm font-medium truncate" style={{ color: "#0E3D45" }}>{s.email}</span>
+                      {(s.visit_count ?? 1) > 1 && (
+                        <span
+                          className="flex items-center gap-1 text-[.58rem] tracking-[.1em] uppercase font-bold px-2 py-0.5 flex-shrink-0"
+                          style={{ backgroundColor: "rgba(122,158,138,.15)", color: "#7A9E8A" }}
+                        >
+                          <Repeat size={10} /> {s.visit_count}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4 flex-shrink-0">
+                      <span className="text-[.72rem]" style={{ color: "#7A9E8A" }}>{formatDate(s.created_at)}</span>
+                      <ChevronDown
+                        size={15}
+                        style={{ color: "#7A9E8A", transform: isOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }}
+                      />
+                    </div>
                   </button>
+
+                  {isOpen && (
+                    <div className="px-5 pb-5 pt-1 border-t border-[#D8E6E3]">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                        <div>
+                          <p className="text-[.6rem] tracking-[.12em] uppercase font-semibold" style={{ color: "#7A9E8A" }}>Registrada el</p>
+                          <p className="text-[.8rem]" style={{ color: "#0E3D45" }}>{formatDate(s.created_at)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[.6rem] tracking-[.12em] uppercase font-semibold" style={{ color: "#7A9E8A" }}>Última visita</p>
+                          <p className="text-[.8rem]" style={{ color: "#0E3D45" }}>{s.last_seen_at ? formatDate(s.last_seen_at) : formatDate(s.created_at)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[.6rem] tracking-[.12em] uppercase font-semibold" style={{ color: "#7A9E8A" }}>Visitas</p>
+                          <p className="text-[.8rem]" style={{ color: "#0E3D45" }}>{s.visit_count ?? 1}</p>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <Globe size={14} className="mt-0.5 flex-shrink-0" style={{ color: "#1A7A8A" }} />
+                          <div>
+                            <p className="text-[.6rem] tracking-[.12em] uppercase font-semibold" style={{ color: "#7A9E8A" }}>Dirección IP</p>
+                            <p className="text-[.8rem]" style={{ color: "#0E3D45" }}>{s.ip_address || "—"}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <Monitor size={14} className="mt-0.5 flex-shrink-0" style={{ color: "#1A7A8A" }} />
+                          <div>
+                            <p className="text-[.6rem] tracking-[.12em] uppercase font-semibold" style={{ color: "#7A9E8A" }}>Dispositivo</p>
+                            <p className="text-[.8rem]" style={{ color: "#0E3D45" }}>{parseDevice(s.user_agent)}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <MapPin size={14} className="mt-0.5 flex-shrink-0" style={{ color: "#1A7A8A" }} />
+                          <div>
+                            <p className="text-[.6rem] tracking-[.12em] uppercase font-semibold" style={{ color: "#7A9E8A" }}>Última página</p>
+                            <p className="text-[.8rem]" style={{ color: "#0E3D45" }}>{parsePageName(s.page_path)}</p>
+                          </div>
+                        </div>
+                      </div>
+                      {s.user_agent && (
+                        <p className="text-[.68rem] mb-4 leading-relaxed break-all" style={{ color: "#7A9E8A" }}>
+                          {s.user_agent}
+                        </p>
+                      )}
+                      <button
+                        onClick={() => handleDelete(s.id, s.email)}
+                        disabled={deletingId === s.id}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-[.65rem] font-semibold tracking-wide uppercase transition-opacity hover:opacity-80 disabled:opacity-40"
+                        style={{ border: "1px solid rgba(212,87,58,.25)", color: "#D4573A", backgroundColor: "rgba(212,87,58,.06)" }}
+                      >
+                        <Trash2 size={12} />
+                        {deletingId === s.id ? "…" : "Eliminar"}
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

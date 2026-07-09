@@ -5,10 +5,21 @@ import Link from "next/link";
 export default function Tienda() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (email) setSubmitted(true);
+    if (!email.trim()) return;
+
+    setLoading(true);
+    const res = await fetch("/api/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email.trim().toLowerCase(), page_path: "/tienda" }),
+    });
+    setLoading(false);
+
+    if (res.ok) setSubmitted(true);
   }
 
   return (
@@ -69,9 +80,10 @@ export default function Tienda() {
                 />
                 <button
                   type="submit"
-                  className="text-[.65rem] tracking-[.18em] uppercase font-semibold text-white bg-[#D4573A] px-6 py-3.5 hover:bg-[#E8795A] transition-colors whitespace-nowrap"
+                  disabled={loading}
+                  className="text-[.65rem] tracking-[.18em] uppercase font-semibold text-white bg-[#D4573A] px-6 py-3.5 hover:bg-[#E8795A] transition-colors whitespace-nowrap disabled:opacity-50"
                 >
-                  Avisarme
+                  {loading ? "…" : "Avisarme"}
                 </button>
               </div>
               <p className="text-[.62rem] text-[rgba(245,239,230,.25)] mt-3 tracking-wide">

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { Check, AlertCircle } from "lucide-react";
 
 export default function NewsletterBar() {
@@ -17,12 +16,16 @@ export default function NewsletterBar() {
 
     setStatus("loading");
 
-    const { error } = await supabase.from("subscribers").upsert(
-      { email: email.trim().toLowerCase(), created_at: new Date().toISOString() },
-      { onConflict: "email" }
-    );
+    const res = await fetch("/api/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email.trim().toLowerCase(),
+        page_path: typeof window !== "undefined" ? window.location.pathname : "",
+      }),
+    });
 
-    if (error) {
+    if (!res.ok) {
       setStatus("error");
       setErrorMsg("Hubo un problema. Intenta de nuevo.");
       return;
