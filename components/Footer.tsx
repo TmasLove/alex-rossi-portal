@@ -9,10 +9,17 @@ const links = [
   { label: "Suplementos",   href: "/suplementos" },
 ];
 
+// Live sister sites in the ecosystem — direct external links (followed, no
+// nofollow) so this footer passes SEO authority to them site-wide.
+const portales = [
+  { label: "ladolcevitacasa.com",      href: "https://www.ladolcevitacasa.com" },
+  { label: "dolcevitasupplements.com", href: "https://www.dolcevitasupplements.com" },
+];
+
 export default function Footer() {
   return (
     <footer className="bg-[#062028] text-[rgba(245,239,230,.6)]">
-      <div className="max-w-6xl mx-auto px-8 py-16 grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="max-w-6xl mx-auto px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
 
         <div>
           <img
@@ -52,6 +59,24 @@ export default function Footer() {
                 <Link href={l.href} className="text-[.82rem] text-[rgba(245,239,230,.4)] hover:text-[#E8795A] transition-colors tracking-wide">
                   {l.label}
                 </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-[.58rem] tracking-[.2em] uppercase text-[#D4573A] font-semibold mb-5">Portales</p>
+          <ul className="flex flex-col gap-3">
+            {portales.map(p => (
+              <li key={p.href}>
+                <a
+                  href={p.href}
+                  target="_blank"
+                  rel="noopener"
+                  className="text-[.82rem] text-[rgba(245,239,230,.4)] hover:text-[#E8795A] transition-colors tracking-wide"
+                >
+                  {p.label}
+                </a>
               </li>
             ))}
           </ul>
