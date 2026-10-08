@@ -18,9 +18,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Servicio no disponible." }, { status: 503 });
   }
 
-  const { email, page_path } = await req.json();
+  let body: { email?: unknown; page_path?: unknown; website?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Solicitud inválida." }, { status: 400 });
+  }
+  const { email, website } = body;
+  const page_path = typeof body.page_path === "string" ? body.page_path.slice(0, 300) : "";
 
-  if (!email || typeof email !== "string" || !email.includes("@")) {
+  // Honeypot: a hidden field only bots fill in. Pretend it worked, store nothing.
+  if (typeof website === "string" && website.trim() !== "") {
+    return NextResponse.json({ ok: true });
+  }
+
+  if (
+    typeof email !== "string" ||
+    email.length > 254 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())
+  ) {
     return NextResponse.json({ error: "Correo inválido." }, { status: 400 });
   }
 
