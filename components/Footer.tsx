@@ -104,6 +104,17 @@ export default function Footer() {
           alexandrarossi.com
         </p>
       </div>
+      <p className="max-w-6xl mx-auto px-8 pb-6 text-center text-[.62rem] tracking-[.06em] text-[rgba(245,239,230,.25)]">
+        Website by{" "}
+        <a
+          href="https://tommyroldan.com/"
+          target="_blank"
+          rel="noopener"
+          className="text-[rgba(245,239,230,.45)] hover:text-[#E8795A] transition-colors"
+        >
+          TommyOS
+        </a>
+      </p>
     </footer>
   );
 }
