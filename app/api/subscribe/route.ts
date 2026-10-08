@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Created per request, not at module load: `next build` imports this file
+// while collecting page data, and a top-level createClient() with a missing
+// key crashed every Vercel build ("supabaseKey is required").
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+}
 
 export async function POST(req: NextRequest) {
+  const supabaseAdmin = getSupabaseAdmin();
+  if (!supabaseAdmin) {
+    console.error("[subscribe] NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set");
+    return NextResponse.json({ error: "Servicio no disponible." }, { status: 503 });
+  }
+
   const { email, page_path } = await req.json();
 
   if (!email || typeof email !== "string" || !email.includes("@")) {
